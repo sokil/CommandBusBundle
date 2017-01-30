@@ -1,0 +1,11 @@
+services:
+  sokil.command_bus:
+    class: Sokil\CommandBusBundle\Bus
+    arguments:
+      - []
+      - "@sokil.command_bus.command_handler_service_resolver"
+
+  sokil.command_bus.command_handler_service_resolver:
+    class: Sokil\CommandBusBundle\Bus\CommandHandlerServiceResolver
+    calls:
+      - [setContainer, ["@service_container"]]
