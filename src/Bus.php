@@ -2,7 +2,6 @@
 
 namespace Sokil\CommandBusBundle;
 
-use Sokil\CommandBusBundle\Bus\AbstractCommand;
 use Sokil\CommandBusBundle\Bus\CommandHandlerServiceResolver;
 
 class Bus
@@ -31,10 +30,10 @@ class Bus
     }
 
     /**
-     * @param AbstractCommand $command
+     * @param mixed $command
      * @return mixed response
      */
-    public function handle(AbstractCommand $command)
+    public function handle($command)
     {
         $commandClassName = get_class($command);
 

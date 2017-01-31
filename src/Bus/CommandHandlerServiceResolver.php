@@ -25,14 +25,14 @@ class CommandHandlerServiceResolver implements ContainerAwareInterface
     /**
      * Get command handler
      * @param string $handlerServiceId
-     * @return AbstractCommandHandler
+     * @return CommandHandlerInterface
      */
     public function get($handlerServiceId)
     {
         $handler = $this->container->get($handlerServiceId);
 
-        if (!$handler instanceof AbstractCommandHandler) {
-            throw new \InvalidArgumentException('Handler must be instance if ' . AbstractCommandHandler::class);
+        if (!$handler instanceof CommandHandlerInterface) {
+            throw new \InvalidArgumentException('Handler must be instance if ' . CommandHandlerInterface::class);
         }
 
         return $handler;
