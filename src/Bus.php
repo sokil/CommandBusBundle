@@ -58,6 +58,7 @@ class Bus
         foreach ($handlerDefinitions as $handlerDefinition) {
             // get handler
             $handlerServiceId = $handlerDefinition['handler'];
+            $handlerAlias = empty($handlerDefinition['alias']) ? $handlerServiceId : $handlerDefinition['alias'];
             $handler = $this->commandHandlerServiceResolver->get($handlerServiceId);
 
             // execute command by handler
@@ -65,7 +66,7 @@ class Bus
 
             // append handler response
             if (!empty($handlerResponse)) {
-                $response[$handlerServiceId] = $handlerResponse;
+                $response[$handlerAlias] = $handlerResponse;
             }
         }
 
