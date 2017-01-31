@@ -37,18 +37,38 @@ class Bus
     {
         $commandClassName = get_class($command);
 
-        // get handler definition by command instance
+        // get handler definitions by command instance
         if (empty($this->handlerDefinitions[$commandClassName])) {
             throw new \InvalidArgumentException('Passed command not configured in bus');
         }
 
-        $handlerDefinition = $this->handlerDefinitions[$commandClassName];
+        $handlerDefinitions = $this->handlerDefinitions[$commandClassName];
 
-        // get handler
-        $handlerServiceId = $handlerDefinition['handler'];
-        $handler = $this->commandHandlerServiceResolver->get($handlerServiceId);
+        // order handlers by priority
+        usort($handlerDefinitions, function($handlerDefinition1, $handlerDefinition2) {
+            if ($handlerDefinition1['priority'] === $handlerDefinition2['proirity']) {
+                return 0;
+            }
 
-        // execute command by handler
-        return $handler->handle($command);
+            return ($handlerDefinition1['priority'] < $handlerDefinition2['proirity']) ? -1 : 1;
+        });
+
+        // handle
+        $response = [];
+        foreach ($handlerDefinitions as $handlerDefinition) {
+            // get handler
+            $handlerServiceId = $handlerDefinition['handler'];
+            $handler = $this->commandHandlerServiceResolver->get($handlerServiceId);
+
+            // execute command by handler
+            $handlerResponse = $handler->handle($command);
+
+            // append handler response
+            if (!empty($handlerResponse)) {
+                $response[$handlerServiceId] = $handlerResponse;
+            }
+        }
+
+        return $response;
     }
 }

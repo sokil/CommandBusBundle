@@ -9,7 +9,6 @@ class RegisterCommandHandlerCompilerPass implements CompilerPassInterface
 {
     const COMMAND_BUS_SERVICE_ID = 'sokil.command_bus';
     const TAG_NAME = 'sokil.command_bus_handler';
-    const TAG_COMMAND_CLASS_ARGUMENT_NAME = 'command_class';
 
     /**
      * @param ContainerBuilder $container
@@ -20,8 +19,10 @@ class RegisterCommandHandlerCompilerPass implements CompilerPassInterface
 
         foreach ($container->findTaggedServiceIds(self::TAG_NAME) as $commandBusHandlerServiceId => $commandBusHandlerTags) {
             foreach ($commandBusHandlerTags as $commandBusHandlerTagParams) {
-                $commandClassName = $commandBusHandlerTagParams[self::TAG_COMMAND_CLASS_ARGUMENT_NAME];
-                $handlers[$commandClassName] = [
+                $commandClassName = $commandBusHandlerTagParams['command_class'];
+                $priority = !empty($commandBusHandlerTagParams['priority'])  ? (int)$commandBusHandlerTagParams['priority'] : 0;
+                $handlers[$commandClassName][] = [
+                    'priority' => $priority,
                     'handler' => $commandBusHandlerServiceId
                 ];
             }
