@@ -3,6 +3,7 @@
 namespace Sokil\CommandBusBundle;
 
 use Sokil\CommandBusBundle\Bus\CommandHandlerServiceResolver;
+use Sokil\CommandBusBundle\Bus\Exception\CommandUnacceptableByHandlerException;
 
 class Bus
 {
@@ -59,8 +60,19 @@ class Bus
             $handlerServiceId = $handlerDefinition['handler'];
             $handler = $this->commandHandlerServiceResolver->get($handlerServiceId);
 
+            // check if handler may handle command
+            if (!$handler->supports($command)) {
+                throw new CommandUnacceptableByHandlerException(sprintf(
+                    'Command %s is not supported by handler %s',
+                    get_class($handler),
+                    get_class($command)
+                ));
+            }
+
             // execute command by handler
             $handler->handle($command);
         }
     }
+
+
 }
