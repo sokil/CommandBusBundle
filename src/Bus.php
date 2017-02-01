@@ -31,7 +31,7 @@ class Bus
 
     /**
      * @param mixed $command
-     * @return mixed response
+     * @return void
      */
     public function handle($command)
     {
@@ -54,22 +54,13 @@ class Bus
         });
 
         // handle
-        $response = [];
         foreach ($handlerDefinitions as $handlerDefinition) {
             // get handler
             $handlerServiceId = $handlerDefinition['handler'];
-            $handlerAlias = empty($handlerDefinition['alias']) ? $handlerServiceId : $handlerDefinition['alias'];
             $handler = $this->commandHandlerServiceResolver->get($handlerServiceId);
 
             // execute command by handler
-            $handlerResponse = $handler->handle($command);
-
-            // append handler response
-            if (!empty($handlerResponse)) {
-                $response[$handlerAlias] = $handlerResponse;
-            }
+            $handler->handle($command);
         }
-
-        return $response;
     }
 }
