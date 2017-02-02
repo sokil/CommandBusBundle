@@ -1,7 +1,8 @@
 <?php
 
-namespace Sokil\CommandBusBundle\DependencyInjection;
+namespace Sokil\CommandBusBundle;
 
+use Sokil\CommandBusBundle\DependencyInjection\RegisterCommandHandlerCompilerPass;
 use Sokil\CommandBusBundle\Stub\CheckFraudTransactionCommandHandler;
 use Sokil\CommandBusBundle\Stub\ProcessTransactionCommandHandler;
 use Sokil\CommandBusBundle\Stub\SendMoneyCommand;
@@ -9,8 +10,9 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Component\DependencyInjection\Reference;
 
-class RegisterCommandHandlerCompilerPassTest extends \PHPUnit_Framework_TestCase
+class BusTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @return ContainerBuilder
@@ -20,7 +22,7 @@ class RegisterCommandHandlerCompilerPassTest extends \PHPUnit_Framework_TestCase
         $containerBuilder = new ContainerBuilder();
 
         // load services
-        $loader = new YamlFileLoader($containerBuilder, new FileLocator(__DIR__.'/../../src/Resources/config'));
+        $loader = new YamlFileLoader($containerBuilder, new FileLocator(__DIR__.'/../src/Resources/config'));
         $loader->load('services.yml');
 
         // fraud repository
@@ -29,12 +31,14 @@ class RegisterCommandHandlerCompilerPassTest extends \PHPUnit_Framework_TestCase
             ->setFactory([\SplFixedArray::class, 'fromArray'])
             ->setArguments([
                 [
+                    0 => false,
                     1 => false,
-                    2 => false,
+                    2 => true,
                     3 => true,
-                    4 => true,
                 ]
             ]);
+
+        $containerBuilder->setDefinition('fraud_repository', $fraudRepositoryServiceDefinition);
 
         // account repository
         $accountRepositoryServiceDefinition = new Definition(\SplFixedArray::class);
@@ -42,18 +46,20 @@ class RegisterCommandHandlerCompilerPassTest extends \PHPUnit_Framework_TestCase
             ->setFactory([\SplFixedArray::class, 'fromArray'])
             ->setArguments([
                 [
+                    0 => 10,
                     1 => 10,
                     2 => 10,
                     3 => 10,
-                    4 => 10,
                 ]
             ]);
+
+        $containerBuilder->setDefinition('account_repository', $accountRepositoryServiceDefinition);
 
         // first handler definition
         $checkFraudTransactionCommandHandlerServiceDefinition = new Definition();
         $checkFraudTransactionCommandHandlerServiceDefinition
             ->setClass(CheckFraudTransactionCommandHandler::class)
-            ->setArguments([$fraudRepositoryServiceDefinition])
+            ->setArguments([new Reference('fraud_repository')])
             ->addTag(
                 RegisterCommandHandlerCompilerPass::TAG_NAME,
                 [
@@ -71,7 +77,7 @@ class RegisterCommandHandlerCompilerPassTest extends \PHPUnit_Framework_TestCase
         $processTransactionCommandHandlerServiceDefinition = new Definition();
         $processTransactionCommandHandlerServiceDefinition
             ->setClass(ProcessTransactionCommandHandler::class)
-            ->setArguments([$accountRepositoryServiceDefinition])
+            ->setArguments([new Reference('account_repository')])
             ->addTag(
                 RegisterCommandHandlerCompilerPass::TAG_NAME,
                 [
@@ -99,7 +105,7 @@ class RegisterCommandHandlerCompilerPassTest extends \PHPUnit_Framework_TestCase
     {
         $container = $this->createContainer();
 
-        $sendMoneyCommand = new SendMoneyCommand(1, 2, 5);
+        $sendMoneyCommand = new SendMoneyCommand(0, 1, 5);
 
         $container
             ->get(RegisterCommandHandlerCompilerPass::COMMAND_BUS_SERVICE_ID)
@@ -112,6 +118,17 @@ class RegisterCommandHandlerCompilerPassTest extends \PHPUnit_Framework_TestCase
                 'ProcessTransaction',
             ],
             $sendMoneyCommand->getLog()
+        );
+
+        // assert amount
+        $this->assertSame(
+            [
+                0 => 5,
+                1 => 15,
+                2 => 10,
+                3 => 10,
+            ],
+            $container->get('account_repository')->toArray()
         );
     }
 }
