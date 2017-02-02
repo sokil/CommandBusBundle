@@ -47,11 +47,11 @@ class Bus
 
         // order handlers by priority
         usort($handlerDefinitions, function($handlerDefinition1, $handlerDefinition2) {
-            if ($handlerDefinition1['priority'] === $handlerDefinition2['proirity']) {
+            if ($handlerDefinition1['priority'] === $handlerDefinition2['priority']) {
                 return 0;
             }
 
-            return ($handlerDefinition1['priority'] < $handlerDefinition2['proirity']) ? -1 : 1;
+            return ($handlerDefinition1['priority'] < $handlerDefinition2['priority']) ? -1 : 1;
         });
 
         // handle
