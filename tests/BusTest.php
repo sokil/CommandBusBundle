@@ -101,7 +101,7 @@ class BusTest extends \PHPUnit_Framework_TestCase
         return $containerBuilder;
     }
 
-    public function testProcess()
+    public function testHandle_SeparateHandlers_Success()
     {
         $container = $this->createContainer();
 
@@ -130,5 +130,10 @@ class BusTest extends \PHPUnit_Framework_TestCase
             ],
             $container->get('account_repository')->toArray()
         );
+    }
+
+    public function testHandle_HandlerChain_Success()
+    {
+
     }
 }
