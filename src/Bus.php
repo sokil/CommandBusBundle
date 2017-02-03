@@ -43,35 +43,23 @@ class Bus
             throw new \InvalidArgumentException('Passed command not configured in bus');
         }
 
-        $handlerDefinitions = $this->handlerDefinitions[$commandClassName];
+        $handlerDefinition = $this->handlerDefinitions[$commandClassName];
 
-        // order handlers by priority
-        usort($handlerDefinitions, function($handlerDefinition1, $handlerDefinition2) {
-            if ($handlerDefinition1['priority'] === $handlerDefinition2['priority']) {
-                return 0;
-            }
+        // get handler
+        $handlerServiceId = $handlerDefinition['handler'];
+        $handler = $this->commandHandlerServiceResolver->get($handlerServiceId);
 
-            return ($handlerDefinition1['priority'] < $handlerDefinition2['priority']) ? -1 : 1;
-        });
-
-        // handle
-        foreach ($handlerDefinitions as $handlerDefinition) {
-            // get handler
-            $handlerServiceId = $handlerDefinition['handler'];
-            $handler = $this->commandHandlerServiceResolver->get($handlerServiceId);
-
-            // check if handler may handle command
-            if (!$handler->supports($command)) {
-                throw new CommandUnacceptableByHandlerException(sprintf(
-                    'Command %s is not supported by handler %s',
-                    get_class($handler),
-                    get_class($command)
-                ));
-            }
-
-            // execute command by handler
-            $handler->handle($command);
+        // check if handler may handle command
+        if (!$handler->supports($command)) {
+            throw new CommandUnacceptableByHandlerException(sprintf(
+                'Command %s is not supported by handler %s',
+                get_class($command),
+                get_class($handler)
+            ));
         }
+
+        // execute command by handler
+        $handler->handle($command);
     }
 
 

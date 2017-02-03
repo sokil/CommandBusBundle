@@ -4,6 +4,7 @@ namespace Sokil\CommandBusBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 class RegisterCommandHandlerCompilerPass implements CompilerPassInterface
 {
@@ -20,9 +21,16 @@ class RegisterCommandHandlerCompilerPass implements CompilerPassInterface
         foreach ($container->findTaggedServiceIds(self::TAG_NAME) as $commandBusHandlerServiceId => $commandBusHandlerTags) {
             foreach ($commandBusHandlerTags as $commandBusHandlerTagParams) {
                 $commandClassName = $commandBusHandlerTagParams['command_class'];
-                $priority = !empty($commandBusHandlerTagParams['priority'])  ? (int)$commandBusHandlerTagParams['priority'] : 0;
-                $handlers[$commandClassName][] = [
-                    'priority' => $priority,
+
+                if (isset($handlers[$commandClassName])) {
+                    throw new InvalidArgumentException(sprintf(
+                        'Handler %s already configured for command %s',
+                        $handlers[$commandClassName]['handler'],
+                        $commandClassName
+                    ));
+                }
+
+                $handlers[$commandClassName] = [
                     'handler' => $commandBusHandlerServiceId
                 ];
             }

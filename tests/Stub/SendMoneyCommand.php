@@ -59,20 +59,4 @@ class SendMoneyCommand
     {
         return $this->amount;
     }
-
-    /**
-     * Log process of passing command through handlers
-     */
-    public function log($message)
-    {
-        $this->transactionLog[] = $message;
-    }
-
-    /**
-     * @return array
-     */
-    public function getLog()
-    {
-        return $this->transactionLog;
-    }
 }

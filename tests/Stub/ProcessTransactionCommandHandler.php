@@ -26,9 +26,6 @@ class ProcessTransactionCommandHandler implements CommandHandlerInterface
      */
     public function handle($command)
     {
-        /** @var $command SendMoneyCommand **/
-        $command->log('ProcessTransaction');
-
         if (!isset($this->accountRepository[$command->getSenderId()])) {
             throw new InvalidCommandException('Sender has no active account');
         }
