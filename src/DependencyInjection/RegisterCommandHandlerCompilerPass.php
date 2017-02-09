@@ -4,41 +4,83 @@ namespace Sokil\CommandBusBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 class RegisterCommandHandlerCompilerPass implements CompilerPassInterface
 {
-    const COMMAND_BUS_SERVICE_ID = 'sokil.command_bus';
-    const TAG_NAME = 'sokil.command_bus_handler';
-
     /**
      * @param ContainerBuilder $container
      */
     public function process(ContainerBuilder $container)
     {
-        $handlers = [];
+        $this->registerHandlersInBuses($container);
+    }
 
-        foreach ($container->findTaggedServiceIds(self::TAG_NAME) as $commandBusHandlerServiceId => $commandBusHandlerTags) {
-            foreach ($commandBusHandlerTags as $commandBusHandlerTagParams) {
-                $commandClassName = $commandBusHandlerTagParams['command_class'];
-
-                if (isset($handlers[$commandClassName])) {
-                    throw new InvalidArgumentException(sprintf(
-                        'Handler %s already configured for command %s',
-                        $handlers[$commandClassName]['handler'],
-                        $commandClassName
-                    ));
-                }
-
-                $handlers[$commandClassName] = [
-                    'handler' => $commandBusHandlerServiceId
-                ];
+    /**
+     * Get command buses
+     *
+     * @param ContainerBuilder $container
+     * @return array
+     */
+    private function getBuses(ContainerBuilder $container)
+    {
+        $buses = [];
+        $busDefinitions = $container->findTaggedServiceIds('sokil.command_bus');
+        foreach ($busDefinitions as $busServiceId => $busTags) {
+            foreach ($busTags as $busTagParams) {
+                $buses[$busServiceId] = $container->findDefinition($busServiceId);
             }
         }
 
-        // set handler definitions to bus
-        $container
-            ->findDefinition(self::COMMAND_BUS_SERVICE_ID)
-            ->replaceArgument(0, $handlers);
+        return $buses;
+    }
+
+    /**
+     * Add handlers to command buses
+     *
+     * @param ContainerBuilder $container
+     */
+    private function registerHandlersInBuses(ContainerBuilder $container)
+    {
+        // Get command buses
+        $buses = $this->getBuses($container);
+
+        // Add handlers to command buses
+        $commandHandlerDefinitions = $container->findTaggedServiceIds('sokil.command_bus_handler');
+        foreach ($commandHandlerDefinitions as $commandHandlerServiceId => $commandBusHandlerTags) {
+            foreach ($commandBusHandlerTags as $commandHandlerTagParams) {
+                // Get command class
+                if (empty($commandHandlerTagParams['command_class'])) {
+                    throw new \InvalidArgumentException(sprintf(
+                        "Parameter '%s' of command handler %s not specified",
+                        'command_class',
+                        $commandHandlerServiceId
+                    ));
+                }
+                $commandClassName = $commandHandlerTagParams['command_class'];
+
+                // Get handler's bus service id
+                if (empty($commandHandlerTagParams['command_bus'])) {
+                    $commandHandlersBusServiceId = 'sokil.command_bus.default';
+                } else {
+                    $commandHandlersBusServiceId = $commandHandlerTagParams['command_bus'];
+                    if (empty($buses[$commandHandlersBusServiceId])) {
+                        throw new \InvalidArgumentException(sprintf(
+                            "Bus with service id '%s' of command handler %s not found",
+                            $commandHandlersBusServiceId,
+                            $commandHandlerServiceId
+                        ));
+                    }
+                }
+
+                // Add handler definition to bus
+                $buses[$commandHandlersBusServiceId]->addMethodCall(
+                    'addHandlerDefinition',
+                    [
+                        $commandClassName,
+                        $commandHandlerServiceId
+                    ]
+                );
+            }
+        }
     }
 }

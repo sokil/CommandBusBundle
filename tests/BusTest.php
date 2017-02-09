@@ -9,8 +9,6 @@ use Sokil\CommandBusBundle\Stub\SendMoneyCommand;
 
 class BusTest extends AbstractTestCase
 {
-
-
     public function testHandle_SuccessfullyHandled()
     {
         $container = $this->createContainer();
@@ -18,7 +16,7 @@ class BusTest extends AbstractTestCase
         $sendMoneyCommand = new SendMoneyCommand(0, 1, 5);
 
         $container
-            ->get(RegisterCommandHandlerCompilerPass::COMMAND_BUS_SERVICE_ID)
+            ->get('sokil.command_bus')
             ->handle($sendMoneyCommand);
 
         // assert amount
@@ -43,7 +41,7 @@ class BusTest extends AbstractTestCase
         $command = new OpenAccountCommand(42, 42);
 
         $container
-            ->get(RegisterCommandHandlerCompilerPass::COMMAND_BUS_SERVICE_ID)
+            ->get('sokil.command_bus')
             ->handle($command);
     }
 }

@@ -40,7 +40,7 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
             ->setClass(CloseAccountCommandHandler::class)
             ->setArguments([new Reference('account_repository')])
             ->addTag(
-                RegisterCommandHandlerCompilerPass::TAG_NAME,
+                'sokil.command_handler',
                 [
                     'command_class' => CloseAccountCommand::class,
                     'priority' => 100,
@@ -57,7 +57,7 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
             ->setClass(ProcessTransactionCommandHandler::class)
             ->setArguments([new Reference('account_repository')])
             ->addTag(
-                RegisterCommandHandlerCompilerPass::TAG_NAME,
+                'sokil.command_bus_handler',
                 [
                     'command_class' => SendMoneyCommand::class,
                     'priority' => 200,
@@ -74,7 +74,7 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
             ->setClass(CloseAccountCommandHandler::class)
             ->setArguments([new Reference('account_repository')])
             ->addTag(
-                RegisterCommandHandlerCompilerPass::TAG_NAME,
+                'sokil.command_bus_handler',
                 [
                     'command_class' => OpenAccountCommand::class,
                     'priority' => 200,

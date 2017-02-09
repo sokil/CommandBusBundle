@@ -1,9 +1,14 @@
 services:
-  sokil.command_bus:
+
+  sokil.command_bus.default:
     class: Sokil\CommandBusBundle\Bus
     arguments:
-      - []
       - "@sokil.command_bus.command_handler_service_resolver"
+    tags:
+      - {name: sokil.command_bus}
+
+  sokil.command_bus:
+    alias: sokil.command_bus.default
 
   sokil.command_bus.command_handler_service_resolver:
     class: Sokil\CommandBusBundle\Bus\CommandHandlerServiceResolver

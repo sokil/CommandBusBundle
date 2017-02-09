@@ -3,6 +3,7 @@
 namespace Sokil\CommandBusBundle;
 
 use Sokil\CommandBusBundle\Bus\CommandHandlerServiceResolver;
+use Sokil\CommandBusBundle\Bus\Exception\CommandBusException;
 use Sokil\CommandBusBundle\Bus\Exception\CommandUnacceptableByHandlerException;
 
 class Bus
@@ -11,7 +12,7 @@ class Bus
      * Map of command class name to handler service id relations
      * @var array
      */
-    private $handlerDefinitions;
+    private $handlerDefinitions = [];
 
     /**
      * @var CommandHandlerServiceResolver
@@ -23,16 +24,40 @@ class Bus
      * @param CommandHandlerServiceResolver $commandHandlerServiceResolver
      */
     public function __construct(
-        array $handlers,
         CommandHandlerServiceResolver $commandHandlerServiceResolver
     ) {
-        $this->handlerDefinitions = $handlers;
         $this->commandHandlerServiceResolver = $commandHandlerServiceResolver;
+    }
+
+    /**
+     * Add handler definition
+     * @param string $commandClassName
+     * @param string $handlerServiceId
+     * @return Bus
+     */
+    public function addHandlerDefinition($commandClassName, $handlerServiceId)
+    {
+        // Check if handler already associated with command
+        if (isset($this->handlerDefinitions[$commandClassName])) {
+            throw new \InvalidArgumentException(sprintf(
+                "Handler with service id '%s' already configured for command %s'",
+                $this->handlerDefinitions[$commandClassName]['handler'],
+                $commandClassName
+            ));
+        }
+
+        // Add handler definition
+        $this->handlerDefinitions[$commandClassName] = [
+            'handler' => $handlerServiceId,
+        ];
+
+        return $this;
     }
 
     /**
      * @param mixed $command
      * @return void
+     * @throws CommandUnacceptableByHandlerException
      */
     public function handle($command)
     {
@@ -40,7 +65,10 @@ class Bus
 
         // get handler definitions by command instance
         if (empty($this->handlerDefinitions[$commandClassName])) {
-            throw new \InvalidArgumentException('Passed command not configured in bus');
+            throw new \InvalidArgumentException(sprintf(
+                'Command %s not configured in any handler',
+                $commandClassName
+            ));
         }
 
         $handlerDefinition = $this->handlerDefinitions[$commandClassName];
@@ -61,6 +89,4 @@ class Bus
         // execute command by handler
         $handler->handle($command);
     }
-
-
 }
