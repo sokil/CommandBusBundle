@@ -1,6 +1,6 @@
 <?php
 
-namespace Sokil\CommandBusBundle\Bus;
+namespace Sokil\CommandBusBundle\CommandBus;
 
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;

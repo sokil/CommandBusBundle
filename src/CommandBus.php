@@ -2,11 +2,10 @@
 
 namespace Sokil\CommandBusBundle;
 
-use Sokil\CommandBusBundle\Bus\CommandHandlerServiceResolver;
-use Sokil\CommandBusBundle\Bus\Exception\CommandBusException;
-use Sokil\CommandBusBundle\Bus\Exception\CommandUnacceptableByHandlerException;
+use Sokil\CommandBusBundle\CommandBus\CommandHandlerServiceResolver;
+use Sokil\CommandBusBundle\CommandBus\Exception\CommandUnacceptableByHandlerException;
 
-class Bus
+class CommandBus
 {
     /**
      * Map of command class name to handler service id relations
@@ -20,7 +19,6 @@ class Bus
     private $commandHandlerServiceResolver;
 
     /**
-     * @param array $handlers
      * @param CommandHandlerServiceResolver $commandHandlerServiceResolver
      */
     public function __construct(
@@ -33,7 +31,7 @@ class Bus
      * Add handler definition
      * @param string $commandClassName
      * @param string $handlerServiceId
-     * @return Bus
+     * @return CommandBus
      */
     public function addHandlerDefinition($commandClassName, $handlerServiceId)
     {

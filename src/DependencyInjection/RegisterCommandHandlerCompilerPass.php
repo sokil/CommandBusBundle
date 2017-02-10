@@ -65,7 +65,7 @@ class RegisterCommandHandlerCompilerPass implements CompilerPassInterface
                     $commandHandlersBusServiceId = $commandHandlerTagParams['command_bus'];
                     if (empty($buses[$commandHandlersBusServiceId])) {
                         throw new \InvalidArgumentException(sprintf(
-                            "Bus with service id '%s' of command handler %s not found",
+                            "CommandBus with service id '%s' of command handler %s not found",
                             $commandHandlersBusServiceId,
                             $commandHandlerServiceId
                         ));

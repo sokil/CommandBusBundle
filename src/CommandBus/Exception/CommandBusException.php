@@ -1,6 +1,6 @@
 <?php
 
-namespace Sokil\CommandBusBundle\Bus\Exception;
+namespace Sokil\CommandBusBundle\CommandBus\Exception;
 
 class CommandBusException extends \Exception
 {

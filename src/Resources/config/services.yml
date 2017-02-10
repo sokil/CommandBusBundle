@@ -1,7 +1,7 @@
 services:
 
   sokil.command_bus.default:
-    class: Sokil\CommandBusBundle\Bus
+    class: Sokil\CommandBusBundle\CommandBus
     arguments:
       - "@sokil.command_bus.command_handler_service_resolver"
     tags:
@@ -11,6 +11,6 @@ services:
     alias: sokil.command_bus.default
 
   sokil.command_bus.command_handler_service_resolver:
-    class: Sokil\CommandBusBundle\Bus\CommandHandlerServiceResolver
+    class: Sokil\CommandBusBundle\CommandBus\CommandHandlerServiceResolver
     calls:
       - [setContainer, ["@service_container"]]

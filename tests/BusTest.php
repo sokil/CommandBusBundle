@@ -2,7 +2,7 @@
 
 namespace Sokil\CommandBusBundle;
 
-use Sokil\CommandBusBundle\Bus\Exception\CommandUnacceptableByHandlerException;
+use Sokil\CommandBusBundle\CommandBus\Exception\CommandUnacceptableByHandlerException;
 use Sokil\CommandBusBundle\DependencyInjection\RegisterCommandHandlerCompilerPass;
 use Sokil\CommandBusBundle\Stub\OpenAccountCommand;
 use Sokil\CommandBusBundle\Stub\SendMoneyCommand;
@@ -32,7 +32,7 @@ class BusTest extends AbstractTestCase
     }
 
     /**
-     * @expectedException \Sokil\CommandBusBundle\Bus\Exception\CommandUnacceptableByHandlerException
+     * @expectedException \Sokil\CommandBusBundle\CommandBus\Exception\CommandUnacceptableByHandlerException
      */
     public function testHandle_WrongCommandPassedToHandler()
     {

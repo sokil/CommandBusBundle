@@ -2,8 +2,8 @@
 
 namespace Sokil\CommandBusBundle\Stub;
 
-use Sokil\CommandBusBundle\Bus\CommandHandlerInterface;
-use Sokil\CommandBusBundle\Bus\Exception\InvalidCommandException;
+use Sokil\CommandBusBundle\CommandBus\CommandHandlerInterface;
+use Sokil\CommandBusBundle\CommandBus\Exception\InvalidCommandException;
 
 class ProcessTransactionCommandHandler implements CommandHandlerInterface
 {
