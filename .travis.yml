@@ -11,7 +11,7 @@ before_script:
 
 script:
   - mkdir -p log
-  - ./vendor/bin/phpunit -c tests/phpunit.xml --coverage-clover log/clover.xml tests
+  - composer cover
 
 after_script:
-  - php ./vendor/bin/coveralls -v
+  - composer coveralls
