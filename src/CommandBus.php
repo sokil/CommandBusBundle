@@ -4,6 +4,7 @@ namespace Sokil\CommandBusBundle;
 
 use Sokil\CommandBusBundle\CommandBus\CommandHandlerServiceResolver;
 use Sokil\CommandBusBundle\CommandBus\Exception\CommandUnacceptableByHandlerException;
+use Sokil\CommandBusBundle\CommandBus\Exception\InvalidCommandException;
 
 class CommandBus
 {
@@ -63,7 +64,7 @@ class CommandBus
 
         // get handler definitions by command instance
         if (empty($this->handlerDefinitions[$commandClassName])) {
-            throw new \InvalidArgumentException(sprintf(
+            throw new InvalidCommandException(sprintf(
                 'Command %s not configured in any handler',
                 $commandClassName
             ));

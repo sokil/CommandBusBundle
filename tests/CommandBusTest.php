@@ -2,12 +2,10 @@
 
 namespace Sokil\CommandBusBundle;
 
-use Sokil\CommandBusBundle\CommandBus\Exception\CommandUnacceptableByHandlerException;
-use Sokil\CommandBusBundle\DependencyInjection\RegisterCommandHandlerCompilerPass;
 use Sokil\CommandBusBundle\Stub\OpenAccountCommand;
 use Sokil\CommandBusBundle\Stub\SendMoneyCommand;
 
-class BusTest extends AbstractTestCase
+class CommandBusTest extends AbstractTestCase
 {
     public function testHandle_SuccessfullyHandled()
     {
@@ -39,6 +37,21 @@ class BusTest extends AbstractTestCase
         $container = $this->createContainer();
 
         $command = new OpenAccountCommand(42, 42);
+
+        $container
+            ->get('sokil.command_bus')
+            ->handle($command);
+    }
+
+    /**
+     * @expectedException \Sokil\CommandBusBundle\CommandBus\Exception\InvalidCommandException
+     * @expectedExceptionMessage Command stdClass not configured in any handler
+     */
+    public function testHandle_UnconfiguredCommandPassedToHandler()
+    {
+        $container = $this->createContainer();
+
+        $command = new \stdClass();
 
         $container
             ->get('sokil.command_bus')
