@@ -2,8 +2,10 @@
 
 namespace Sokil\CommandBusBundle;
 
+use Sokil\CommandBusBundle\CommandBus\Exception\InvalidCommandException;
 use Sokil\CommandBusBundle\Stub\OpenAccountCommand;
 use Sokil\CommandBusBundle\Stub\SendMoneyCommand;
+use Symfony\Component\Validator\ConstraintViolationList;
 
 class CommandBusTest extends AbstractTestCase
 {
@@ -56,5 +58,17 @@ class CommandBusTest extends AbstractTestCase
         $container
             ->get('sokil.command_bus')
             ->handle($command);
+    }
+
+    public function testHandle_InvalidCommand()
+    {
+        $constraintViolationList = new ConstraintViolationList();
+
+        $exception = new InvalidCommandException();
+        $exception->setConstraintViolationList($constraintViolationList);
+
+        $this->assertSame($constraintViolationList, $exception->getConstraintViolationList());
+
+
     }
 }
