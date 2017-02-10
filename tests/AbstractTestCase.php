@@ -40,10 +40,9 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
             ->setClass(CloseAccountCommandHandler::class)
             ->setArguments([new Reference('account_repository')])
             ->addTag(
-                'sokil.command_handler',
+                'sokil.command_bus_handler',
                 [
                     'command_class' => CloseAccountCommand::class,
-                    'priority' => 100,
                 ]
             );
 
@@ -60,7 +59,6 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
                 'sokil.command_bus_handler',
                 [
                     'command_class' => SendMoneyCommand::class,
-                    'priority' => 200,
                 ]
             );
 
@@ -77,7 +75,6 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
                 'sokil.command_bus_handler',
                 [
                     'command_class' => OpenAccountCommand::class,
-                    'priority' => 200,
                 ]
             );
 
@@ -124,5 +121,41 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
         $containerBuilder->compile();
 
         return $containerBuilder;
+    }
+
+    protected function createBrokenContainerWithNotPassedHandlersCommandClass()
+    {
+        $containerBuilder = new ContainerBuilder();
+
+        // load services
+        $loader = new YamlFileLoader($containerBuilder, new FileLocator(__DIR__.'/../src/Resources/config'));
+        $loader->load('services.yml');
+
+        // account repository
+        $containerBuilder->setDefinition('account_repository', $this->createAccountRepositoryDefinition());
+
+        // handler with not passed command class
+        $closeAccountCommandHandlerServiceDefinition = new Definition();
+        $closeAccountCommandHandlerServiceDefinition
+            ->setClass(CloseAccountCommandHandler::class)
+            ->setArguments([new Reference('account_repository')])
+            ->addTag(
+                'sokil.command_bus_handler',
+                [
+                    //'command_class' => CloseAccountCommand::class,
+                ]
+            );
+
+        $containerBuilder->setDefinition(
+            'close_account_command_handler',
+            $closeAccountCommandHandlerServiceDefinition
+        );
+
+        // process compiler pass
+        $compilerPass = new RegisterCommandHandlerCompilerPass();
+        $compilerPass->process($containerBuilder);
+
+        // build container
+        $containerBuilder->compile();
     }
 }

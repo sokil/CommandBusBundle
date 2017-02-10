@@ -4,6 +4,7 @@ namespace Sokil\CommandBusBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 class RegisterCommandHandlerCompilerPass implements CompilerPassInterface
 {
@@ -50,8 +51,8 @@ class RegisterCommandHandlerCompilerPass implements CompilerPassInterface
             foreach ($commandBusHandlerTags as $commandHandlerTagParams) {
                 // Get command class
                 if (empty($commandHandlerTagParams['command_class'])) {
-                    throw new \InvalidArgumentException(sprintf(
-                        "Parameter '%s' of command handler %s not specified",
+                    throw new InvalidArgumentException(sprintf(
+                        "Parameter '%s' of command handler '%s' not specified",
                         'command_class',
                         $commandHandlerServiceId
                     ));
@@ -64,8 +65,8 @@ class RegisterCommandHandlerCompilerPass implements CompilerPassInterface
                 } else {
                     $commandHandlersBusServiceId = $commandHandlerTagParams['command_bus'];
                     if (empty($buses[$commandHandlersBusServiceId])) {
-                        throw new \InvalidArgumentException(sprintf(
-                            "CommandBus with service id '%s' of command handler %s not found",
+                        throw new InvalidArgumentException(sprintf(
+                            "CommandBus with service id '%s' of command handler '%s' not found",
                             $commandHandlersBusServiceId,
                             $commandHandlerServiceId
                         ));
