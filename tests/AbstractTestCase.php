@@ -2,7 +2,6 @@
 
 namespace Sokil\CommandBusBundle;
 
-use Sokil\CommandBusBundle\DependencyInjection\RegisterCommandHandlerCompilerPass;
 use Sokil\CommandBusBundle\Stub\CloseAccountCommand;
 use Sokil\CommandBusBundle\Stub\CloseAccountCommandHandler;
 use Sokil\CommandBusBundle\Stub\OpenAccountCommand;
@@ -12,6 +11,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Sokil\CommandBusBundle\DependencyInjection\CommandBusExtension;
+use Sokil\CommandBusBundle\CommandBusBundle;
 
 abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
 {
@@ -91,6 +91,10 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
         $extension = new CommandBusExtension();
         $extension->load([], $containerBuilder);
 
+        // build bundle
+        $bundle = new CommandBusBundle();
+        $bundle->build($containerBuilder);
+        
         // account repository
         $containerBuilder->setDefinition('account_repository', $this->createAccountRepositoryDefinition());
 
@@ -112,10 +116,6 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
             $this->createCommandHandlerWithNotSupportedCommandDefinition()
         );
 
-        // process compiler pass
-        $compilerPass = new RegisterCommandHandlerCompilerPass();
-        $compilerPass->process($containerBuilder);
-
         // build container
         $containerBuilder->compile();
 
@@ -125,11 +125,15 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
     protected function createBrokenContainerWithNotPassedHandlersCommandClass()
     {
         $containerBuilder = new ContainerBuilder();
-                
+        
         // load services
         $extension = new CommandBusExtension();
         $extension->load([], $containerBuilder);
 
+        // build bundle
+        $bundle = new CommandBusBundle();
+        $bundle->build($containerBuilder);
+        
         // account repository
         $containerBuilder->setDefinition('account_repository', $this->createAccountRepositoryDefinition());
 
@@ -149,10 +153,6 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
             'close_account_command_handler',
             $closeAccountCommandHandlerServiceDefinition
         );
-
-        // process compiler pass
-        $compilerPass = new RegisterCommandHandlerCompilerPass();
-        $compilerPass->process($containerBuilder);
 
         // build container
         $containerBuilder->compile();
