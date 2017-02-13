@@ -88,8 +88,8 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
         $containerBuilder = new ContainerBuilder();
 
         // load services
-        $loader = new YamlFileLoader($containerBuilder, new FileLocator(__DIR__.'/../src/Resources/config'));
-        $loader->load('services.yml');
+        $extension = new CommandBusExtension();
+        $extension->load([], $containerBuilder);
 
         // account repository
         $containerBuilder->setDefinition('account_repository', $this->createAccountRepositoryDefinition());
