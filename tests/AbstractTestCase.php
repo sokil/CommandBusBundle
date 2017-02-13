@@ -8,11 +8,10 @@ use Sokil\CommandBusBundle\Stub\CloseAccountCommandHandler;
 use Sokil\CommandBusBundle\Stub\OpenAccountCommand;
 use Sokil\CommandBusBundle\Stub\ProcessTransactionCommandHandler;
 use Sokil\CommandBusBundle\Stub\SendMoneyCommand;
-use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
+use Sokil\CommandBusBundle\DependencyInjection\CommandBusExtension;
 
 abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
 {
@@ -126,10 +125,10 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
     protected function createBrokenContainerWithNotPassedHandlersCommandClass()
     {
         $containerBuilder = new ContainerBuilder();
-
+                
         // load services
-        $loader = new YamlFileLoader($containerBuilder, new FileLocator(__DIR__.'/../src/Resources/config'));
-        $loader->load('services.yml');
+        $extension = new CommandBusExtension();
+        $extension->load([], $containerBuilder);
 
         // account repository
         $containerBuilder->setDefinition('account_repository', $this->createAccountRepositoryDefinition());
