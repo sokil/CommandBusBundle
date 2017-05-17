@@ -55,7 +55,7 @@ class CommandBus
 
     /**
      * @param mixed $command
-     * @return void
+     * @return mixed
      * @throws CommandUnacceptableByHandlerException
      */
     public function handle($command)
@@ -86,6 +86,6 @@ class CommandBus
         }
 
         // execute command by handler
-        $handler->handle($command);
+        return $handler->handle($command);
     }
 }
