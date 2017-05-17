@@ -1,6 +1,7 @@
 {
     "name": "sokil/command-bus-bundle",
     "description": "Command Bus Bundle",
+    "type": "symfony-bundle",
     "license": "MIT",
     "authors": [
         {
