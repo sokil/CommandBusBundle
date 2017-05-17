@@ -8,7 +8,7 @@ interface CommandHandlerInterface
      * Handle command
      *
      * @param object $command
-     * @return void
+     * @return mixed
      */
     public function handle($command);
 
